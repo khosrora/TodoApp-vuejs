@@ -1,13 +1,13 @@
 <template>
   <AppHeader />
   <main>
-    <AddTodo @AddNewTodo="AddTodo" />
+    <AddTodo @AddNewTodo="handleAddTodo" />
     <ul class="todos">
       <Todo
         v-for="(item, index) in getTodo"
         :key="item.id"
         :todo="item"
-        @Deleted="deleteTodo"
+        @onDeleted="deleteTodo"
         @changeStatus="changeTodoStatus"
         @dragstart="dragStart(index)"
         @dragover.prevent
@@ -51,86 +51,79 @@
   <AppFooter />
 </template>
 
-<script>
+<script setup>
+import { useToast } from "vue-toastification";
 import AppHeader from "./components/AppHeader.vue";
 import AddTodo from "./components/AddTodo.vue";
 import AppFooter from "./components/AppFooter.vue";
 import Todo from "./components/Todo.vue";
 
-export default {
-  data() {
-    return {
-      todos: [],
-      dragging: -1,
-      activeTab: "all",
-    };
-  },
-  name: "App",
-  components: {
-    AppHeader,
-    AddTodo,
-    AppFooter,
-    Todo,
-  },
-  computed: {
-    getActiveTodoCount() {
-      return this.todos.filter((f) => f.isComplete == false).length;
-    },
-    getTodo() {
-      switch (this.activeTab) {
-        case "all":
-          return this.todos;
-        case "active":
-          return this.todos.filter((f) => f.isComplete == false);
-        case "completed":
-          return this.todos.filter((f) => f.isComplete == true);
-        default:
-          return this.todos;
-      }
-    },
-  },
-  methods: {
-    AddTodo(title) {
-      const id = Math.random().toString(16).slice(2);
-      const todo = {
-        id,
-        title,
-        isComplete: false,
-      };
-      this.todos.push(todo);
-      this.$toast.success("عملیات با موفقیت انجام شد");
-    },
-    deleteTodo(id) {
-      const todo = this.todos.find((f) => f.id == id);
-      this.todos = this.todos.filter((f) => f.id !== id);
-      this.$toast.error(`${todo.title} حذف شد`);
-    },
-    changeTodoStatus(id, status) {
-      var newTodos = [...this.todos];
-      var selectedTodo = newTodos.find((f) => f.id === id);
-      selectedTodo.isComplete = status;
-      this.todos = newTodos;
-    },
-    deleteCompleted() {
-      if (confirm("آیا از انجام مطمئنی ؟ ")) {
-        var newTodos = [...this.todos];
-        newTodos = newTodos.filter((f) => f.isComplete === false);
-        this.todos = newTodos;
-      }
-    },
-    dragStart(index) {
-      this.dragging = index;
-    },
-    drop(index) {
-      var newElement = this.todos.splice(this.dragging, 1)[0];
-      this.todos.splice(index, 0, newElement);
-    },
-    changeTab(tab) {
-      console.log(this.activeTab);
-      this.activeTab = tab;
-    },
-  },
-};
+import { ref, computed } from "vue";
+
+const toast = useToast();
+var todos = ref([]);
+const dragging = ref(-1);
+const activeTab = ref("all");
+
+const getActiveTodoCount = computed(() => {
+  return todos.value.filter((f) => f.isComplete == false).length;
+});
+
+const getTodo = computed(() => {
+  switch (activeTab.value) {
+    case "all":
+      return todos.value;
+    case "active":
+      return todos.value.filter((f) => f.isComplete == false);
+    case "completed":
+      return todos.value.filter((f) => f.isComplete == true);
+    default:
+      return todos;
+  }
+});
+
+function handleAddTodo(title) {
+  if (!title) {
+    toast.error("عنوان را وارد کنید");
+    return;
+  }
+  const id = Math.random().toString(16).slice(2);
+  const todo = {
+    id,
+    title,
+    isComplete: false,
+  };
+  todos.value.push(todo);
+  toast.success("عملیات با موفقیت انجام شد");
+}
+function deleteTodo(id) {
+  const todo = todos.value.find((f) => f.id == id);
+  todos.value = todos.value.filter((f) => f.id !== id);
+  toast.error(`${todo.title} حذف شد`);
+}
+function changeTodoStatus(id, status) {
+  var newTodos = [...todos.value];
+  var selectedTodo = newTodos.find((f) => f.id === id);
+  selectedTodo.isComplete = status;
+  todos.value = newTodos;
+}
+function deleteCompleted() {
+  if (confirm("آیا از انجام مطمئنی ؟ ")) {
+    var newTodos = [...todos.value];
+    newTodos = newTodos.filter((f) => f.isComplete === false);
+    todos.value = newTodos;
+  }
+}
+function dragStart(index) {
+  dragging.value = index;
+}
+function drop(index) {
+  var newElement = todos.value.splice(dragging.value, 1)[0];
+  todos.value.splice(index, 0, newElement);
+}
+function changeTab(tab) {
+  activeTab.value = tab;
+}
 </script>
 
 <style>

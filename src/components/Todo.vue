@@ -14,33 +14,26 @@
       <span v-else v-text="todo.title"></span>
     </p>
     <button class="clear" @click="deleteTodo">
-      <img :src="deleteIcon" alt="Clear it" />
+      <img :src="DeleteSvg" alt="Clear it" />
     </button>
   </li>
 </template>
 
-<script>
-import DeleteSvg from "../assets/icon-cross.svg"
-
-export default {
-  data(){
-    return {
-      deleteIcon : DeleteSvg,
-    }
-  },
-  props: {
-    todo: Object,
-  },
-  methods: {
-    deleteTodo() {
-      if (confirm("آیا از حذف اطمینان دارید")) {
-        this.$emit("Deleted", this.todo.id);
-      }
-    },
-    changeStatus() {
-      this.$emit("changeStatus", this.todo.id, !this.todo.isComplete);
-    },
-  },
+<script setup>
+import DeleteSvg from "../assets/icon-cross.svg";
+import { defineProps, toRef, defineEmits } from "vue";
+const props = defineProps({
+  todo: Object,
+});
+const todo = toRef(props, "todo");
+const emits = defineEmits(["onDeleted", "changeStatus"]);
+const deleteTodo = () => {
+  if (confirm("آیا از حذف اطمینان دارید")) {
+    emits("onDeleted", todo.value.id);
+  }
+};
+const changeStatus = () => {
+  emits("changeStatus", todo.value.id, !todo.value.isComplete);
 };
 </script>
 

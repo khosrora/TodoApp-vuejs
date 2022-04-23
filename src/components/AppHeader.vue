@@ -3,37 +3,26 @@
     <h1>لیست وظایف</h1>
 
     <button id="theme-switcher" @click="changeTheme">
-      <img
-        v-if="defaultTheme == 'dark'"
-        :src="sunImage"
-        alt="Change color theme"
-      />
-      <img v-else :src="moonImage" alt="Change color theme" />
+      <img v-if="defaultTheme == 'dark'" :src="Sun" alt="Change color theme" />
+      <img v-else :src="Moon" alt="Change color theme" />
     </button>
   </header>
 </template>
 
-<script>
+<script setup>
+import { ref } from "vue";
 import Sun from "../assets/icon-sun.svg";
 import Moon from "../assets/icon-moon.svg";
-export default {
-  data() {
-    return {
-      sunImage: Sun,
-      moonImage: Moon,
-      defaultTheme: "dark",
-    };
-  },
-  methods: {
-    changeTheme() {
-      if (this.defaultTheme === "dark") {
-        this.defaultTheme = "light";
-        document.querySelector("body").classList.add("light");
-      } else {
-        this.defaultTheme = "dark";
-        document.querySelector("body").classList.remove("light");
-      }
-    },
-  },
+
+const defaultTheme = ref("dark");
+
+const changeTheme = () => {
+  if (defaultTheme.value === "dark") {
+    defaultTheme.value = "light";
+    document.querySelector("body").classList.add("light");
+  } else {
+    defaultTheme.value = "dark";
+    document.querySelector("body").classList.remove("light");
+  }
 };
 </script>

@@ -1,12 +1,11 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 
-// Import one of the available themes
-//import 'vue-toast-notification/dist/theme-default.css';
-import VueToast from 'vue-toast-notification';
-import 'vue-toast-notification/dist/theme-sugar.css';
+import Toast from "vue-toastification";
+// Import the CSS or use your own!
+import "vue-toastification/dist/index.css";
 
-createApp(App).use(VueToast, {
-    position: "top-left" ,
-    
+createApp(App).use(Toast, {
+    rtl: "true",
+
 }).mount('#app')
